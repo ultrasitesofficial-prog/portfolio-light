@@ -1,0 +1,406 @@
+@import "tailwindcss";
+
+/* ————————————————————————————————————————————————
+   ULTRASITE — design tokens
+   Warm modular studio language:
+   "paper" = CREAM — warm paper ground, pine display, periwinkle shapes
+   "ink"   = PINE  — deep forest green moments (studio, contact, footer)
+   One spark: warm gold, used sparingly.
+   Semantic vars flip per chapter; components read semantics only.
+   ———————————————————————————————————————————————— */
+
+:root {
+  /* raw palette */
+  --cream: #faf3e9;
+  --cream-deep: #f1e7d6;
+  --card: #fffdf8;
+  --pine: #17352b;
+  --pine-deep: #0f2620;
+  --peri: #c9d9f7;       /* periwinkle — the soft geometry */
+  --peri-deep: #8fb2ef;
+  --gold: #e8b14e;       /* warm gold — the spark */
+  --gold-deep: #a97517;
+
+  /* semantics (cream chapter default) */
+  --bg: var(--cream);
+  --bg-deep: var(--cream-deep);
+  --fg: #1e312a;
+  --muted: #5f6f66;
+  --line: rgba(23, 53, 43, 0.14);
+  --line-strong: rgba(23, 53, 43, 0.34);
+  --accent: #2e5d4b;
+  --accent-2: var(--gold-deep);
+  --panel: var(--card);
+  --glow: rgba(143, 178, 239, 0.5);
+}
+
+html[data-theme="ink"] {
+  --bg: var(--pine);
+  --bg-deep: var(--pine-deep);
+  --fg: #f6eedf;
+  --muted: #9fb4a6;
+  --line: rgba(246, 238, 223, 0.16);
+  --line-strong: rgba(246, 238, 223, 0.38);
+  --accent: #a9c6f2;
+  --accent-2: var(--gold);
+  --panel: rgba(246, 238, 223, 0.06);
+  --glow: rgba(169, 198, 242, 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-panel: var(--panel);
+  /* legacy names — the fixed dark surface + light type (menu overlay, preloader) */
+  --color-ink: var(--pine);
+  --color-bone: #f6eedf;
+  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ——— base ——— */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, [role="button"], summary {
+  touch-action: manipulation;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+/* paper grain — quiet warmth on the cream field */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  animation: grain 9s steps(6) infinite;
+}
+
+@media (pointer: coarse) {
+  body::after {
+    inset: 0;
+    opacity: 0.028;
+    animation: none;
+  }
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-6%, 4%); }
+  40% { transform: translate(4%, -7%); }
+  60% { transform: translate(-3%, -3%); }
+  80% { transform: translate(6%, 5%); }
+}
+
+::selection {
+  background: var(--peri);
+  color: var(--pine);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* repeat visitors: hide preloader before hydration (attr set by inline head script) */
+html[data-ready="true"] .preloader { display: none; }
+
+/* lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* custom cursor active */
+html[data-cursor="on"] body,
+html[data-cursor="on"] a,
+html[data-cursor="on"] button,
+html[data-cursor="on"] [role="button"] {
+  cursor: none;
+}
+
+/* ——— type voices ——— */
+
+.voice-mono {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+.voice-mono-lg {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+
+.voice-d1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3.2rem, 11.5vw, 10rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.voice-d2 {
+  font-family: var(--font-display);
+  font-weight: 750;
+  font-size: clamp(2.2rem, 5.2vw, 4.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+
+.voice-d3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  line-height: 1.14;
+  letter-spacing: -0.014em;
+}
+
+.voice-d4 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: clamp(1.2rem, 1.9vw, 1.55rem);
+  line-height: 1.3;
+  letter-spacing: -0.008em;
+}
+
+.voice-body {
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  line-height: 1.75;
+  font-weight: 430;
+}
+
+/* ——— shared pieces ——— */
+
+.hairline-t { border-top: 1px solid var(--line); }
+.hairline-b { border-bottom: 1px solid var(--line); }
+
+.container-x {
+  padding-left: max(clamp(1.25rem, 4vw, 4rem), env(safe-area-inset-left));
+  padding-right: max(clamp(1.25rem, 4vw, 4rem), env(safe-area-inset-right));
+  width: 100%;
+  max-width: 110rem;
+  margin-inline: auto;
+}
+
+/* pill button — soft, decisive; fills with periwinkle on hover */
+.plate-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.05rem 1.9rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.plate-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, var(--peri), var(--peri-deep));
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+  border-radius: inherit;
+}
+.plate-btn:hover {
+  color: var(--pine);
+  box-shadow: 0 14px 40px -14px var(--glow);
+  transform: translateY(-1px);
+}
+.plate-btn:hover::before { transform: scaleY(1); }
+
+/* ghost pill — quiet secondary (menu button, chips that act) */
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.3rem;
+  border-radius: 999px;
+  background: var(--peri);
+  color: var(--pine);
+  transition: background 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.pill-btn:hover { background: var(--peri-deep); transform: translateY(-1px); }
+
+/* chip — white pill label */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.05rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+/* touch: hover never fires — press IS the interaction */
+@media (hover: none) {
+  .plate-btn:active { color: var(--pine); transition-duration: 0.12s; }
+  .plate-btn:active::before { transform: scaleY(1); transition-duration: 0.16s; }
+  .pill-btn:active { background: var(--peri-deep); }
+  .u-link:active::after {
+    transform: scaleX(1);
+    transform-origin: left;
+    transition-duration: 0.18s;
+  }
+  .marquee:active .marquee-track { animation-play-state: paused; }
+}
+
+/* underline link */
+.u-link {
+  position: relative;
+  display: inline-block;
+}
+.u-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.u-link:hover::after,
+.u-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* availability pulse — a golden signal */
+.pulse-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  opacity: 0;
+  animation: pulse 2.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(0.4); opacity: 0.9; }
+  70%, 100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* live border — a slow periwinkle→gold current tracing a card's edge */
+@property --plate-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.live-border {
+  position: relative;
+}
+.live-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--plate-angle),
+    transparent 0turn,
+    var(--accent) 0.1turn,
+    var(--accent-2) 0.2turn,
+    transparent 0.34turn
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: plate-spin 7s linear infinite;
+  pointer-events: none;
+}
+@keyframes plate-spin {
+  to { --plate-angle: 1turn; }
+}
+
+/* soft modular shape — the periwinkle geometry behind heroes */
+.blob {
+  position: absolute;
+  background: linear-gradient(160deg, var(--peri) 10%, var(--peri-deep) 90%);
+  pointer-events: none;
+}
+
+/* marquee */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* slow rotation for the circular badge */
+@keyframes spin-slow {
+  to { transform: rotate(1turn); }
+}
+.spin-slow { animation: spin-slow 14s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+  .marquee-track { animation: none; width: 100%; flex-wrap: wrap; }
+  .marquee-dup { display: none; }
+  .pulse-dot::after { animation: none; }
+  .live-border::before { animation: none; opacity: 0.5; }
+  .spin-slow { animation: none; }
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
